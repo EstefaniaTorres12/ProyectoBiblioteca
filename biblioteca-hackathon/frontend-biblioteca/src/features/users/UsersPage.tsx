@@ -45,13 +45,14 @@ export function UsersPage() {
       </Button>
 
       {showForm && (
-        <Stack component="form" onSubmit={handleCreate} spacing={2} sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+        <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
           <Typography variant="h6">Nuevo usuario</Typography>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField
             label="Nombre *"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
+            autoComplete="off"
             required
             fullWidth
           />
@@ -60,6 +61,7 @@ export function UsersPage() {
             type="email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
+            autoComplete="off"
             required
             fullWidth
           />
@@ -68,7 +70,13 @@ export function UsersPage() {
             type="password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            inputProps={{ minLength: 6 }}
+            autoComplete="new-password"
+            inputProps={{
+              minLength: 6,
+              readOnly: true,
+              onFocus: (e: React.FocusEvent<HTMLInputElement>) =>
+                e.currentTarget.removeAttribute('readOnly'),
+            }}
             required
             fullWidth
           />
@@ -76,6 +84,7 @@ export function UsersPage() {
             label="Teléfono"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            autoComplete="off"
             fullWidth
           />
           <Stack direction="row" spacing={1}>
