@@ -51,9 +51,21 @@ export function LoansPage() {
   }
 
   async function handleReturn(id: number) {
-    await returnLoan(id);
-    void loadLoans();
-    void loadBooks();
+    setError('');
+    setSuccess('');
+    try {
+      const returned = await returnLoan(id);
+      const fine = Number(returned.fineAmount);
+      setSuccess(
+        fine > 0
+          ? `Devolución registrada. Multa: $${fine.toLocaleString('es-CO')}`
+          : 'Devolución registrada sin multa'
+      );
+      void loadLoans();
+      void loadBooks();
+    } catch (err: any) {
+      setError(err.response?.data?.message ?? 'Error al registrar la devolución');
+    }
   }
 
   const availableBooks = books.filter((b) => b.availableQuantity > 0);
