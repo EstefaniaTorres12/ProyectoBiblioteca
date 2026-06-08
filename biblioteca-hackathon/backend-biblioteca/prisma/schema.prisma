@@ -13,12 +13,18 @@ enum LoanStatus {
   VENCIDO
 }
 
+enum UserRole {
+  ADMIN
+  SOCIO
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
   password  String
   phone     String?
+  role      UserRole @default(SOCIO)
   createdAt DateTime @default(now())
   loans     Loan[]
 }

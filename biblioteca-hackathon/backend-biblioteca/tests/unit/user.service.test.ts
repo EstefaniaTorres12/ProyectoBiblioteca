@@ -13,7 +13,8 @@ const fakeUser = {
   name: 'Ana García',
   email: 'ana@biblioteca.com',
   phone: null,
-  createdAt: new Date()
+  role: 'SOCIO' as const,
+  createdAt: new Date(),
 };
 
 describe('UserService', () => {

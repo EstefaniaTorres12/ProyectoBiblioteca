@@ -19,7 +19,13 @@ function Home() {
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
   if (!token) return <Navigate to="/login" replace />;
+  if (role !== 'ADMIN') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    return <Navigate to="/login" replace />;
+  }
   return <>{children}</>;
 }
 
