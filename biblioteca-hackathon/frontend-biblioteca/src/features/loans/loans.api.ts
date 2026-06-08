@@ -10,3 +10,14 @@ export async function returnLoan(id: number): Promise<Loan> {
   const { data } = await apiClient.patch(`/loans/${id}/return`);
   return data;
 }
+
+export interface CreateLoanPayload {
+  userId: number;
+  bookId: number;
+  expectedReturnDate?: string;
+}
+
+export async function createLoan(payload: CreateLoanPayload): Promise<Loan> {
+  const { data } = await apiClient.post('/loans', payload);
+  return data;
+}
