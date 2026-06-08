@@ -36,7 +36,9 @@ export function LoansPage() {
       await createLoan({
         userId: form.userId,
         bookId: form.bookId,
-        expectedReturnDate: form.expectedReturnDate || undefined,
+        expectedReturnDate: form.expectedReturnDate
+          ? new Date(form.expectedReturnDate).toISOString()
+          : undefined,
       });
       setSuccess('Préstamo registrado correctamente');
       setForm({ userId: 0, bookId: 0, expectedReturnDate: '' });
