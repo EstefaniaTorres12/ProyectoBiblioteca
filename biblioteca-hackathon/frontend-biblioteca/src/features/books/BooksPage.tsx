@@ -1,4 +1,4 @@
-import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Book } from '../../types/domain';
 import { createBook, getBooks } from './books.api';
@@ -92,13 +92,30 @@ export function BooksPage() {
         <Button variant="contained" onClick={() => load()}>Buscar</Button>
       </Stack>
 
-      {books.map((book) => (
-        <div key={book.id}>
-          {book.title} — {book.author}
-          {book.isbn && ` | ISBN: ${book.isbn}`}
-          {` | Disponibles: ${book.availableQuantity}/${book.totalQuantity}`}
-        </div>
-      ))}
+      <TableContainer component={Paper}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Título</strong></TableCell>
+              <TableCell><strong>Autor</strong></TableCell>
+              <TableCell><strong>ISBN</strong></TableCell>
+              <TableCell align="center"><strong>Disponibles</strong></TableCell>
+              <TableCell align="center"><strong>Total</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {books.map((book) => (
+              <TableRow key={book.id} hover>
+                <TableCell>{book.title}</TableCell>
+                <TableCell>{book.author}</TableCell>
+                <TableCell>{book.isbn ?? '—'}</TableCell>
+                <TableCell align="center">{book.availableQuantity}</TableCell>
+                <TableCell align="center">{book.totalQuantity}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Stack>
   );
 }
