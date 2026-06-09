@@ -13,8 +13,7 @@ const fakeUser = {
   name: 'Admin',
   email: 'admin@biblioteca.com',
   password: 'hashed',
-  phone: null,
-  createdAt: new Date()
+  role: 'ADMIN' as const,
 };
 
 describe('AuthService', () => {
@@ -36,11 +35,18 @@ describe('AuthService', () => {
     await expect(service.login('admin@biblioteca.com', 'wrong')).rejects.toThrow('Credenciales inválidas');
   });
 
-  it('retorna token si las credenciales son correctas', async () => {
+  it('lanza error si el usuario no es ADMIN', async () => {
+    MockedAuthRepository.prototype.findByEmail.mockResolvedValue({ ...fakeUser, role: 'SOCIO' as const });
+    (mockedBcrypt.compare as jest.Mock).mockResolvedValue(true);
+    await expect(service.login('socio@biblioteca.com', 'pass123')).rejects.toThrow('Acceso denegado: solo administradores');
+  });
+
+  it('retorna token y role ADMIN si las credenciales son correctas', async () => {
     MockedAuthRepository.prototype.findByEmail.mockResolvedValue(fakeUser);
     (mockedBcrypt.compare as jest.Mock).mockResolvedValue(true);
     const result = await service.login('admin@biblioteca.com', 'demo1234');
     expect(result).toHaveProperty('token');
     expect(typeof result.token).toBe('string');
+    expect(result.role).toBe('ADMIN');
   });
 });

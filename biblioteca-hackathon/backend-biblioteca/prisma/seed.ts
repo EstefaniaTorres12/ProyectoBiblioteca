@@ -13,6 +13,7 @@ async function main() {
       name: 'Administrador',
       email: 'admin@biblioteca.com',
       password: passwordHash,
+      role: 'ADMIN',
     },
   });
 

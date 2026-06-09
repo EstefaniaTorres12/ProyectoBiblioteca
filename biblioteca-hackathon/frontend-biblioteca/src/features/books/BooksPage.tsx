@@ -46,7 +46,7 @@ export function BooksPage() {
       </Button>
 
       {showForm && (
-        <Stack component="form" onSubmit={handleCreate} spacing={2} sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+        <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
           <Typography variant="h6">Nuevo libro</Typography>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField

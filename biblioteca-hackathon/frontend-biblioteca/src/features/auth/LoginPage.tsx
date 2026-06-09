@@ -13,8 +13,9 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      const { token } = await login({ email, password });
+      const { token, role } = await login({ email, password });
       localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
       navigate('/');
     } catch {
       setError('Email o contraseña incorrectos');

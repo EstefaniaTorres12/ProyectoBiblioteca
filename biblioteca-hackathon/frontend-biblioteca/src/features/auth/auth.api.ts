@@ -7,6 +7,7 @@ export interface LoginPayload {
 
 export interface LoginResponse {
   token: string;
+  role: 'ADMIN' | 'SOCIO';
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
