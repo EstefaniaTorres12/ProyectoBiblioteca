@@ -6,9 +6,17 @@ const service = new BookService();
 
 export class BookController {
   async create(req: Request, res: Response) {
-    const data = createBookSchema.parse(req.body);
-    const book = await service.create(data);
-    res.status(201).json(book);
+    try {
+      const data = createBookSchema.parse(req.body);
+      const book = await service.create(data);
+      res.status(201).json(book);
+    } catch (error: any) {
+      if (error?.code === 'P2002') {
+        res.status(409).json({ message: 'Ya existe un libro con ese ISBN' });
+        return;
+      }
+      throw error;
+    }
   }
 
   async findAll(req: Request, res: Response) {
