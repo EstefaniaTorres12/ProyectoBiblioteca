@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum LoanStatus {
+  ACTIVO
+  DEVUELTO
+  VENCIDO
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  createdAt DateTime @default(now())
+  loans     Loan[]
+}
+
+model Book {
+  id                Int      @id @default(autoincrement())
+  title             String
+  author            String
+  isbn              String?  @unique
+  totalQuantity     Int      @default(1)
+  availableQuantity Int      @default(1)
+  createdAt         DateTime @default(now())
+  loans             Loan[]
+}
+
+model Loan {
+  id                 Int        @id @default(autoincrement())
+  userId             Int
+  bookId             Int
+  loanDate           DateTime   @default(now())
+  expectedReturnDate DateTime
+  actualReturnDate   DateTime?
+  status             LoanStatus @default(ACTIVO)
+  fineAmount         Decimal    @default(0)
+  user               User       @relation(fields: [userId], references: [id])
+  book               Book       @relation(fields: [bookId], references: [id])
+
+  @@index([userId])
+  @@index([bookId])
+  @@index([status])
+}
