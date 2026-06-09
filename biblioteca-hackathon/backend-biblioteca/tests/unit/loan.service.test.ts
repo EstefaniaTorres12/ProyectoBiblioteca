@@ -54,6 +54,49 @@ describe('LoanService', () => {
     });
   });
 
+  describe('returnBook', () => {
+    it('lanza error si el préstamo no existe', async () => {
+      MockedLoans.prototype.findById.mockResolvedValue(null);
+      await expect(service.returnBook(99)).rejects.toThrow('Préstamo no existe');
+    });
+
+    it('lanza error si el préstamo ya fue devuelto', async () => {
+      MockedLoans.prototype.findById.mockResolvedValue(
+        { ...fakeLoan, actualReturnDate: new Date() } as any
+      );
+      await expect(service.returnBook(1)).rejects.toThrow('El préstamo ya fue devuelto');
+    });
+
+    it('registra devolución con multa cuando hay días de retraso', async () => {
+      const past = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+      MockedLoans.prototype.findById.mockResolvedValue(
+        { ...fakeLoan, expectedReturnDate: past, actualReturnDate: null } as any
+      );
+      MockedBooks.prototype.incrementAvailable.mockResolvedValue(undefined as any);
+      MockedLoans.prototype.returnLoan.mockResolvedValue(
+        { ...fakeLoan, status: 'DEVUELTO', fineAmount: 3000, actualReturnDate: new Date() } as any
+      );
+      await service.returnBook(1);
+      expect(MockedBooks.prototype.incrementAvailable).toHaveBeenCalledWith(1);
+      expect(MockedLoans.prototype.returnLoan).toHaveBeenCalledWith(
+        1, expect.any(Date), expect.any(Number)
+      );
+    });
+
+    it('registra devolución sin multa cuando se entrega a tiempo', async () => {
+      const future = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+      MockedLoans.prototype.findById.mockResolvedValue(
+        { ...fakeLoan, expectedReturnDate: future, actualReturnDate: null } as any
+      );
+      MockedBooks.prototype.incrementAvailable.mockResolvedValue(undefined as any);
+      MockedLoans.prototype.returnLoan.mockResolvedValue(
+        { ...fakeLoan, status: 'DEVUELTO', fineAmount: 0, actualReturnDate: new Date() } as any
+      );
+      await service.returnBook(1);
+      expect(MockedLoans.prototype.returnLoan).toHaveBeenCalledWith(1, expect.any(Date), 0);
+    });
+  });
+
   describe('calculateFine', () => {
     it('calcula multa cuando hay días de retraso', () => {
       const expected = new Date('2026-06-01T00:00:00.000Z');
