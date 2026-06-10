@@ -110,4 +110,20 @@ describe('LoanService', () => {
       expect(service.calculateFine(expected, actual)).toBe(0);
     });
   });
+
+  describe('findActive', () => {
+    it('retorna todos los préstamos activos', async () => {
+      MockedLoans.prototype.findActive.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findActive();
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findActive).toHaveBeenCalledTimes(1);
+    });
+
+    it('retorna lista vacía cuando no hay préstamos activos', async () => {
+      MockedLoans.prototype.findActive.mockResolvedValue([]);
+      const result = await service.findActive();
+      expect(result).toEqual([]);
+    });
+  });
+
 });

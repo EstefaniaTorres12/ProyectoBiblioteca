@@ -149,16 +149,18 @@ export function LoansPage() {
                 </TableCell>
               </TableRow>
             )}
-            {loans.map((loan) => (
-              <TableRow key={loan.id} hover>
+            {loans.map((loan) => {
+              const isOverdue = loan.status === 'ACTIVO' && new Date(loan.expectedReturnDate) < new Date();
+              return (
+              <TableRow key={loan.id} hover sx={isOverdue ? { backgroundColor: '#fdecea' } : {}}>
                 <TableCell>{loan.book?.title ?? '—'}</TableCell>
                 <TableCell>{loan.user?.name ?? '—'}</TableCell>
                 <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
                 <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
                 <TableCell align="center">
                   <Chip
-                    label={loan.status}
-                    color={loan.status === 'VENCIDO' ? 'error' : loan.status === 'ACTIVO' ? 'success' : 'default'}
+                    label={isOverdue ? 'VENCIDO' : loan.status}
+                    color={isOverdue ? 'error' : loan.status === 'ACTIVO' ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
@@ -170,7 +172,8 @@ export function LoansPage() {
                   )}
                 </TableCell>
               </TableRow>
-            ))}
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
