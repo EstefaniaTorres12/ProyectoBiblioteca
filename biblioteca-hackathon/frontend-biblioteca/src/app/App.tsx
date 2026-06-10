@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { Box, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from '../features/auth/LoginPage';
 import { BooksPage } from '../features/books/BooksPage';
@@ -6,14 +6,22 @@ import { LoansPage } from '../features/loans/LoansPage';
 import { UsersPage } from '../features/users/UsersPage';
 import { AppLayout } from '../shared/layout/AppLayout';
 
-const theme = createTheme();
+const theme = createTheme({
+  palette: {
+    primary: { main: '#1565c0' },
+    secondary: { main: '#f9a825' },
+  },
+  shape: { borderRadius: 8 },
+});
 
 function Home() {
   return (
-    <>
-      <h1>Gestión de préstamos</h1>
-      <p>Demo funcional para biblioteca comunitaria.</p>
-    </>
+    <Box sx={{ textAlign: 'center', mt: 6 }}>
+      <Typography variant="h3" gutterBottom>Biblioteca Comunitaria</Typography>
+      <Typography variant="subtitle1" color="text.secondary">
+        Sistema de gestión de préstamos — selecciona una sección del menú para comenzar.
+      </Typography>
+    </Box>
   );
 }
 

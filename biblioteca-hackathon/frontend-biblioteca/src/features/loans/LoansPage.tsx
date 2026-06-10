@@ -1,4 +1,4 @@
-import { Alert, Button, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Alert, Button, Chip, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Book, Loan, User } from '../../types/domain';
 import { getBooks } from '../books/books.api';
@@ -79,50 +79,52 @@ export function LoansPage() {
       </Button>
 
       {showForm && (
-        <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-          <Typography variant="h6">Nuevo préstamo</Typography>
-          {error && <Alert severity="error">{error}</Alert>}
+        <Paper elevation={2} sx={{ maxWidth: 480, borderRadius: 2 }}>
+          <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ p: 3 }}>
+            <Typography variant="h6">Nuevo préstamo</Typography>
+            {error && <Alert severity="error">{error}</Alert>}
 
-          <TextField
-            label="Usuario *"
-            select
-            value={form.userId || ''}
-            onChange={(e) => setForm({ ...form, userId: Number(e.target.value) })}
-            required
-            fullWidth
-          >
-            {users.map((u) => (
-              <MenuItem key={u.id} value={u.id}>{u.name}</MenuItem>
-            ))}
-          </TextField>
+            <TextField
+              label="Usuario *"
+              select
+              value={form.userId || ''}
+              onChange={(e) => setForm({ ...form, userId: Number(e.target.value) })}
+              required
+              fullWidth
+            >
+              {users.map((u) => (
+                <MenuItem key={u.id} value={u.id}>{u.name}</MenuItem>
+              ))}
+            </TextField>
 
-          <TextField
-            label="Libro *"
-            select
-            value={form.bookId || ''}
-            onChange={(e) => setForm({ ...form, bookId: Number(e.target.value) })}
-            required
-            fullWidth
-          >
-            {availableBooks.map((b) => (
-              <MenuItem key={b.id} value={b.id}>{b.title} ({b.availableQuantity} disponibles)</MenuItem>
-            ))}
-          </TextField>
+            <TextField
+              label="Libro *"
+              select
+              value={form.bookId || ''}
+              onChange={(e) => setForm({ ...form, bookId: Number(e.target.value) })}
+              required
+              fullWidth
+            >
+              {availableBooks.map((b) => (
+                <MenuItem key={b.id} value={b.id}>{b.title} ({b.availableQuantity} disponibles)</MenuItem>
+              ))}
+            </TextField>
 
-          <TextField
-            label="Fecha devolución esperada"
-            type="date"
-            value={form.expectedReturnDate}
-            onChange={(e) => setForm({ ...form, expectedReturnDate: e.target.value })}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
+            <TextField
+              label="Fecha devolución esperada"
+              type="date"
+              value={form.expectedReturnDate}
+              onChange={(e) => setForm({ ...form, expectedReturnDate: e.target.value })}
+              slotProps={{ inputLabel: { shrink: true } }}
+              fullWidth
+            />
 
-          <Stack direction="row" spacing={1}>
-            <Button type="submit" variant="contained">Guardar</Button>
-            <Button variant="text" onClick={() => setShowForm(false)}>Cancelar</Button>
+            <Stack direction="row" spacing={1}>
+              <Button type="submit" variant="contained">Guardar</Button>
+              <Button variant="text" onClick={() => setShowForm(false)}>Cancelar</Button>
+            </Stack>
           </Stack>
-        </Stack>
+        </Paper>
       )}
 
       {success && <Alert severity="success">{success}</Alert>}
@@ -130,24 +132,35 @@ export function LoansPage() {
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
-            <TableRow>
-              <TableCell><strong>Libro</strong></TableCell>
-              <TableCell><strong>Usuario</strong></TableCell>
-              <TableCell><strong>Fecha préstamo</strong></TableCell>
-              <TableCell><strong>Vence</strong></TableCell>
-              <TableCell align="center"><strong>Estado</strong></TableCell>
-              <TableCell align="center"><strong>Acción</strong></TableCell>
+            <TableRow sx={{ backgroundColor: 'primary.main' }}>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Libro</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Usuario</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Fecha préstamo</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Vence</TableCell>
+              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Estado</TableCell>
+              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
+            {loans.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                  No hay registros
+                </TableCell>
+              </TableRow>
+            )}
             {loans.map((loan) => (
               <TableRow key={loan.id} hover>
                 <TableCell>{loan.book?.title ?? '—'}</TableCell>
                 <TableCell>{loan.user?.name ?? '—'}</TableCell>
                 <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
                 <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
-                <TableCell align="center" sx={{ color: loan.status === 'VENCIDO' ? 'error.main' : 'success.main', fontWeight: 600 }}>
-                  {loan.status}
+                <TableCell align="center">
+                  <Chip
+                    label={loan.status}
+                    color={loan.status === 'VENCIDO' ? 'error' : loan.status === 'ACTIVO' ? 'success' : 'default'}
+                    size="small"
+                  />
                 </TableCell>
                 <TableCell align="center">
                   {loan.status === 'ACTIVO' && (

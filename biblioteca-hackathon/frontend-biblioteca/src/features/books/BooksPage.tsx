@@ -46,43 +46,45 @@ export function BooksPage() {
       </Button>
 
       {showForm && (
-        <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ maxWidth: 480, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-          <Typography variant="h6">Nuevo libro</Typography>
-          {error && <Alert severity="error">{error}</Alert>}
-          <TextField
-            label="Título *"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-            fullWidth
-          />
-          <TextField
-            label="Autor *"
-            value={form.author}
-            onChange={(e) => setForm({ ...form, author: e.target.value })}
-            required
-            fullWidth
-          />
-          <TextField
-            label="ISBN"
-            value={form.isbn}
-            onChange={(e) => setForm({ ...form, isbn: e.target.value })}
-            fullWidth
-          />
-          <TextField
-            label="Cantidad *"
-            type="number"
-            value={form.totalQuantity}
-            onChange={(e) => setForm({ ...form, totalQuantity: Number(e.target.value) })}
-            inputProps={{ min: 1 }}
-            required
-            fullWidth
-          />
-          <Stack direction="row" spacing={1}>
-            <Button type="submit" variant="contained">Guardar</Button>
-            <Button variant="text" onClick={() => setShowForm(false)}>Cancelar</Button>
+        <Paper elevation={2} sx={{ maxWidth: 480, borderRadius: 2 }}>
+          <Stack component="form" onSubmit={handleCreate} spacing={2} autoComplete="off" sx={{ p: 3 }}>
+            <Typography variant="h6">Nuevo libro</Typography>
+            {error && <Alert severity="error">{error}</Alert>}
+            <TextField
+              label="Título *"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              required
+              fullWidth
+            />
+            <TextField
+              label="Autor *"
+              value={form.author}
+              onChange={(e) => setForm({ ...form, author: e.target.value })}
+              required
+              fullWidth
+            />
+            <TextField
+              label="ISBN"
+              value={form.isbn}
+              onChange={(e) => setForm({ ...form, isbn: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Cantidad *"
+              type="number"
+              value={form.totalQuantity}
+              onChange={(e) => setForm({ ...form, totalQuantity: Number(e.target.value) })}
+              slotProps={{ htmlInput: { min: 1 } }}
+              required
+              fullWidth
+            />
+            <Stack direction="row" spacing={1}>
+              <Button type="submit" variant="contained">Guardar</Button>
+              <Button variant="text" onClick={() => setShowForm(false)}>Cancelar</Button>
+            </Stack>
           </Stack>
-        </Stack>
+        </Paper>
       )}
 
       {success && <Alert severity="success">{success}</Alert>}
@@ -95,15 +97,22 @@ export function BooksPage() {
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
-            <TableRow>
-              <TableCell><strong>Título</strong></TableCell>
-              <TableCell><strong>Autor</strong></TableCell>
-              <TableCell><strong>ISBN</strong></TableCell>
-              <TableCell align="center"><strong>Disponibles</strong></TableCell>
-              <TableCell align="center"><strong>Total</strong></TableCell>
+            <TableRow sx={{ backgroundColor: 'primary.main' }}>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Título</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Autor</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>ISBN</TableCell>
+              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Disponibles</TableCell>
+              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
+            {books.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                  No hay registros
+                </TableCell>
+              </TableRow>
+            )}
             {books.map((book) => (
               <TableRow key={book.id} hover>
                 <TableCell>{book.title}</TableCell>
