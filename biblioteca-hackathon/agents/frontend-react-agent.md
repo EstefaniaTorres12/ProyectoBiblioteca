@@ -24,6 +24,23 @@ Reglas obligatorias en formularios de creación/registro:
 
 El formulario de **login** sí puede tener autocompletado normal (`autoComplete="email"` y `autoComplete="current-password"`).
 
+## Dashboard / Pantallas de inicio
+
+La pantalla Home usa un layout de tarjetas (`Card`) con:
+- Icono grande de `@mui/icons-material` centrado
+- Título (`Typography h5`) y descripción (`body2`)
+- Botón `contained` que navega con `useNavigate`
+- Hover con `transform: translateY(-6px)` y `boxShadow` mayor
+- Layout responsive con `Box display:flex flexWrap:wrap` y `width: { xs: '100%', sm: 260 }`
+
+Importar íconos de `@mui/icons-material` (ya instalado). Nunca usar `fontWeight` como prop directo de `Typography` — va dentro de `sx`.
+
+## Tipografía MUI v6 — reglas
+
+- `fontWeight` va en `sx`: `<Typography sx={{ fontWeight: 700 }}>` ✅  NO como prop directo ❌
+- `inputProps` está deprecado en MUI v6 → usar `slotProps={{ htmlInput: {...} }}`
+- `InputLabelProps` está deprecado en MUI v6 → usar `slotProps={{ inputLabel: {...} }}`
+
 ## Checklist antes de terminar
 - La pantalla compila.
 - No hay imports rotos.

@@ -1,5 +1,7 @@
 import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+
+const navLinkSx = { '&.active': { borderBottom: '2px solid white', borderRadius: 0 } };
 
 export function AppLayout() {
   const navigate = useNavigate();
@@ -17,10 +19,10 @@ export function AppLayout() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Biblioteca Comunitaria
           </Typography>
-          <Button color="inherit" component={Link} to="/">Inicio</Button>
-          <Button color="inherit" component={Link} to="/books">Libros</Button>
-          <Button color="inherit" component={Link} to="/users">Usuarios</Button>
-          <Button color="inherit" component={Link} to="/loans">Préstamos</Button>
+          <Button color="inherit" component={NavLink} to="/" end sx={navLinkSx}>Inicio</Button>
+          <Button color="inherit" component={NavLink} to="/books" sx={navLinkSx}>Libros</Button>
+          <Button color="inherit" component={NavLink} to="/users" sx={navLinkSx}>Usuarios</Button>
+          <Button color="inherit" component={NavLink} to="/loans" sx={navLinkSx}>Préstamos</Button>
           <Button color="inherit" onClick={handleLogout}>Salir</Button>
         </Toolbar>
       </AppBar>
