@@ -126,4 +126,18 @@ describe('LoanService', () => {
     });
   });
 
+  describe('findByUser', () => {
+    it('retorna los préstamos del usuario especificado', async () => {
+      MockedLoans.prototype.findByUser.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findByUser(1);
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findByUser).toHaveBeenCalledWith(1);
+    });
+
+    it('retorna lista vacía si el usuario no tiene préstamos', async () => {
+      MockedLoans.prototype.findByUser.mockResolvedValue([]);
+      const result = await service.findByUser(99);
+      expect(result).toEqual([]);
+    });
+  });
 });

@@ -21,3 +21,8 @@ export async function createLoan(payload: CreateLoanPayload): Promise<Loan> {
   const { data } = await apiClient.post('/loans', payload);
   return data;
 }
+
+export async function getLoansByUser(userId: number): Promise<Loan[]> {
+  const { data } = await apiClient.get<Loan[]>(`/loans/user/${userId}`);
+  return data;
+}

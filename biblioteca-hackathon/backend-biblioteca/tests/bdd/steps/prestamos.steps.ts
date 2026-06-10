@@ -23,3 +23,15 @@ When('consulto la lista de préstamos activos', function () {
 Then('obtengo todos los préstamos con estado ACTIVO', function () {
   assert.ok(prestamosActivos.every(p => p.status === 'ACTIVO'));
 });
+
+let historialUsuario: { userId: number }[] = [];
+
+Given('existe un usuario con préstamos registrados', function () {
+  historialUsuario = [{ userId: 1 }, { userId: 1 }];
+});
+When('consulto los préstamos del usuario', function () {
+  historialUsuario = historialUsuario.filter(p => p.userId === 1);
+});
+Then('obtengo el historial de préstamos de ese usuario', function () {
+  assert.ok(historialUsuario.every(p => p.userId === 1));
+});

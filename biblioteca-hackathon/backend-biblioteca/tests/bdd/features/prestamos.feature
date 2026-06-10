@@ -17,3 +17,8 @@ Feature: Gestión de préstamos de biblioteca
     When consulto la lista de préstamos activos
     Then obtengo todos los préstamos con estado ACTIVO
 
+  Scenario: Consultar préstamos por usuario
+    Given existe un usuario con préstamos registrados
+    When consulto los préstamos del usuario
+    Then obtengo el historial de préstamos de ese usuario
+

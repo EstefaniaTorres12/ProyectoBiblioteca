@@ -1,6 +1,8 @@
-import { Alert, Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Alert, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
-import { User } from '../../types/domain';
+import { Loan, User } from '../../types/domain';
+import { getLoansByUser } from '../loans/loans.api';
 import { CreateUserPayload, createUser, getUsers } from './users.api';
 
 export function UsersPage() {
@@ -9,6 +11,9 @@ export function UsersPage() {
   const [form, setForm] = useState<CreateUserPayload>({ name: '', email: '', password: '', phone: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [userLoans, setUserLoans] = useState<Loan[]>([]);
+  const [loadingLoans, setLoadingLoans] = useState(false);
 
   async function load() {
     setUsers(await getUsers());
@@ -33,6 +38,16 @@ export function UsersPage() {
       void load();
     } catch (err: any) {
       setError(err.response?.data?.message ?? 'Error al registrar el usuario');
+    }
+  }
+
+  async function handleViewLoans(user: User) {
+    setSelectedUser(user);
+    setLoadingLoans(true);
+    try {
+      setUserLoans(await getLoansByUser(user.id));
+    } finally {
+      setLoadingLoans(false);
     }
   }
 
@@ -107,12 +122,13 @@ export function UsersPage() {
               <TableCell sx={{ color: 'white', fontWeight: 700 }}>Nombre</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 700 }}>Email</TableCell>
               <TableCell sx={{ color: 'white', fontWeight: 700 }}>Teléfono</TableCell>
+              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={3} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   No hay registros
                 </TableCell>
               </TableRow>
@@ -122,11 +138,65 @@ export function UsersPage() {
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.phone ?? '—'}</TableCell>
+                <TableCell>
+                  <Button size="small" variant="outlined" onClick={() => handleViewLoans(user)}>
+                    Ver Préstamos
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog open={!!selectedUser} onClose={() => setSelectedUser(null)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          Préstamos de {selectedUser?.name}
+          <IconButton onClick={() => setSelectedUser(null)} size="small"><CloseIcon /></IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {loadingLoans ? (
+            <Typography>Cargando...</Typography>
+          ) : userLoans.length === 0 ? (
+            <Typography color="text.secondary" sx={{ py: 2 }}>Este usuario no tiene préstamos registrados.</Typography>
+          ) : (
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: 'primary.main' }}>
+                    <TableCell sx={{ color: 'white', fontWeight: 700 }}>Libro</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 700 }}>Fecha préstamo</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 700 }}>Vence</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 700 }}>Devolución</TableCell>
+                    <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Estado</TableCell>
+                    <TableCell align="right" sx={{ color: 'white', fontWeight: 700 }}>Multa</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {userLoans.map((loan) => (
+                    <TableRow key={loan.id} hover>
+                      <TableCell>{loan.book?.title ?? '—'}</TableCell>
+                      <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
+                      <TableCell>{loan.actualReturnDate ? new Date(loan.actualReturnDate).toLocaleDateString() : '—'}</TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={loan.status}
+                          color={loan.status === 'DEVUELTO' ? 'default' : loan.status === 'ACTIVO' ? 'success' : 'error'}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell align="right">
+                        {Number(loan.fineAmount) > 0 ? `$${Number(loan.fineAmount).toLocaleString('es-CO')}` : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+      </Dialog>
     </Stack>
   );
 }
