@@ -140,4 +140,19 @@ describe('LoanService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('findOverdue', () => {
+    it('retorna los préstamos con fecha de devolución vencida', async () => {
+      MockedLoans.prototype.findOverdue.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findOverdue();
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findOverdue).toHaveBeenCalledWith(expect.any(Date));
+    });
+
+    it('retorna lista vacía cuando no hay préstamos vencidos', async () => {
+      MockedLoans.prototype.findOverdue.mockResolvedValue([]);
+      const result = await service.findOverdue();
+      expect(result).toEqual([]);
+    });
+  });
 });

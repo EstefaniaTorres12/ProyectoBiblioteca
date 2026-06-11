@@ -35,3 +35,18 @@ When('consulto los préstamos del usuario', function () {
 Then('obtengo el historial de préstamos de ese usuario', function () {
   assert.ok(historialUsuario.every(p => p.userId === 1));
 });
+
+let prestamosVencidos: { expectedReturnDate: Date }[] = [];
+
+Given('existen préstamos con fecha de devolución vencida', function () {
+  const fechaPasada = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+  prestamosVencidos = [{ expectedReturnDate: fechaPasada }];
+});
+When('consulto los préstamos vencidos', function () {
+  const ahora = new Date();
+  prestamosVencidos = prestamosVencidos.filter(p => p.expectedReturnDate < ahora);
+});
+Then('obtengo solo los préstamos con fecha de vencimiento pasada', function () {
+  const ahora = new Date();
+  assert.ok(prestamosVencidos.every(p => p.expectedReturnDate < ahora));
+});

@@ -22,3 +22,8 @@ Feature: Gestión de préstamos de biblioteca
     When consulto los préstamos del usuario
     Then obtengo el historial de préstamos de ese usuario
 
+  Scenario: Consultar préstamos vencidos
+    Given existen préstamos con fecha de devolución vencida
+    When consulto los préstamos vencidos
+    Then obtengo solo los préstamos con fecha de vencimiento pasada
+
