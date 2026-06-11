@@ -34,4 +34,11 @@ describe('BookService', () => {
     await service.search('clean');
     expect(MockedRepo.prototype.findAll).toHaveBeenCalledWith('clean');
   });
+
+  it('retorna todos los libros cuando no se especifica búsqueda', async () => {
+    MockedRepo.prototype.findAll.mockResolvedValue([fakeBook] as any);
+    const result = await service.search(undefined);
+    expect(result).toEqual([fakeBook]);
+    expect(MockedRepo.prototype.findAll).toHaveBeenCalledWith(undefined);
+  });
 });

@@ -11,3 +11,19 @@ Feature: Gestión de préstamos de biblioteca
     Given existe un préstamo vencido hace 3 días
     When registro la devolución
     Then la multa debe ser de 3000
+
+  Scenario: Consultar préstamos activos
+    Given existen préstamos activos en el sistema
+    When consulto la lista de préstamos activos
+    Then obtengo todos los préstamos con estado ACTIVO
+
+  Scenario: Consultar préstamos por usuario
+    Given existe un usuario con préstamos registrados
+    When consulto los préstamos del usuario
+    Then obtengo el historial de préstamos de ese usuario
+
+  Scenario: Consultar préstamos vencidos
+    Given existen préstamos con fecha de devolución vencida
+    When consulto los préstamos vencidos
+    Then obtengo solo los préstamos con fecha de vencimiento pasada
+

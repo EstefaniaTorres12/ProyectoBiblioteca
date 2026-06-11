@@ -110,4 +110,49 @@ describe('LoanService', () => {
       expect(service.calculateFine(expected, actual)).toBe(0);
     });
   });
+
+  describe('findActive', () => {
+    it('retorna todos los préstamos activos', async () => {
+      MockedLoans.prototype.findActive.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findActive();
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findActive).toHaveBeenCalledTimes(1);
+    });
+
+    it('retorna lista vacía cuando no hay préstamos activos', async () => {
+      MockedLoans.prototype.findActive.mockResolvedValue([]);
+      const result = await service.findActive();
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findByUser', () => {
+    it('retorna los préstamos del usuario especificado', async () => {
+      MockedLoans.prototype.findByUser.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findByUser(1);
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findByUser).toHaveBeenCalledWith(1);
+    });
+
+    it('retorna lista vacía si el usuario no tiene préstamos', async () => {
+      MockedLoans.prototype.findByUser.mockResolvedValue([]);
+      const result = await service.findByUser(99);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findOverdue', () => {
+    it('retorna los préstamos con fecha de devolución vencida', async () => {
+      MockedLoans.prototype.findOverdue.mockResolvedValue([fakeLoan] as any);
+      const result = await service.findOverdue();
+      expect(result).toEqual([fakeLoan]);
+      expect(MockedLoans.prototype.findOverdue).toHaveBeenCalledWith(expect.any(Date));
+    });
+
+    it('retorna lista vacía cuando no hay préstamos vencidos', async () => {
+      MockedLoans.prototype.findOverdue.mockResolvedValue([]);
+      const result = await service.findOverdue();
+      expect(result).toEqual([]);
+    });
+  });
 });

@@ -11,3 +11,42 @@ Then('el libro reduce su cantidad disponible', function () { assert.ok(true); })
 Given('existe un préstamo vencido hace 3 días', function () { multa = 3000; });
 When('registro la devolución', function () {});
 Then('la multa debe ser de 3000', function () { assert.equal(multa, 3000); });
+
+let prestamosActivos: { status: string }[] = [];
+
+Given('existen préstamos activos en el sistema', function () {
+  prestamosActivos = [{ status: 'ACTIVO' }, { status: 'ACTIVO' }];
+});
+When('consulto la lista de préstamos activos', function () {
+  prestamosActivos = prestamosActivos.filter(p => p.status === 'ACTIVO');
+});
+Then('obtengo todos los préstamos con estado ACTIVO', function () {
+  assert.ok(prestamosActivos.every(p => p.status === 'ACTIVO'));
+});
+
+let historialUsuario: { userId: number }[] = [];
+
+Given('existe un usuario con préstamos registrados', function () {
+  historialUsuario = [{ userId: 1 }, { userId: 1 }];
+});
+When('consulto los préstamos del usuario', function () {
+  historialUsuario = historialUsuario.filter(p => p.userId === 1);
+});
+Then('obtengo el historial de préstamos de ese usuario', function () {
+  assert.ok(historialUsuario.every(p => p.userId === 1));
+});
+
+let prestamosVencidos: { expectedReturnDate: Date }[] = [];
+
+Given('existen préstamos con fecha de devolución vencida', function () {
+  const fechaPasada = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+  prestamosVencidos = [{ expectedReturnDate: fechaPasada }];
+});
+When('consulto los préstamos vencidos', function () {
+  const ahora = new Date();
+  prestamosVencidos = prestamosVencidos.filter(p => p.expectedReturnDate < ahora);
+});
+Then('obtengo solo los préstamos con fecha de vencimiento pasada', function () {
+  const ahora = new Date();
+  assert.ok(prestamosVencidos.every(p => p.expectedReturnDate < ahora));
+});

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Book, Loan, User } from '../../types/domain';
 import { getBooks } from '../books/books.api';
 import { getUsers } from '../users/users.api';
-import { CreateLoanPayload, createLoan, getActiveLoans, returnLoan } from './loans.api';
+import { CreateLoanPayload, createLoan, getActiveLoans, getOverdueLoans, returnLoan } from './loans.api';
 
 export function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -13,6 +13,8 @@ export function LoansPage() {
   const [form, setForm] = useState<CreateLoanPayload>({ userId: 0, bookId: 0, expectedReturnDate: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showOverdue, setShowOverdue] = useState(false);
+  const [overdueLoans, setOverdueLoans] = useState<Loan[]>([]);
 
   async function loadLoans() {
     setLoans(await getActiveLoans());
@@ -68,15 +70,27 @@ export function LoansPage() {
     }
   }
 
+  async function handleToggleOverdue() {
+    if (!showOverdue) {
+      setOverdueLoans(await getOverdueLoans());
+    }
+    setShowOverdue(prev => !prev);
+  }
+
   const availableBooks = books.filter((b) => b.availableQuantity > 0);
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h4">Préstamos activos</Typography>
+      <Typography variant="h4">{showOverdue ? 'Préstamos vencidos' : 'Préstamos activos'}</Typography>
 
-      <Button variant="outlined" sx={{ alignSelf: 'flex-start' }} onClick={() => { setShowForm(!showForm); setError(''); setSuccess(''); }}>
-        {showForm ? 'Cancelar' : 'Registrar Préstamo'}
-      </Button>
+      <Stack direction="row" spacing={1}>
+        <Button variant="outlined" sx={{ alignSelf: 'flex-start' }} onClick={() => { setShowForm(!showForm); setError(''); setSuccess(''); }}>
+          {showForm ? 'Cancelar' : 'Registrar Préstamo'}
+        </Button>
+        <Button variant="outlined" color="warning" sx={{ alignSelf: 'flex-start' }} onClick={handleToggleOverdue}>
+          {showOverdue ? 'Ver Activos' : 'Ver Vencidos'}
+        </Button>
+      </Stack>
 
       {showForm && (
         <Paper elevation={2} sx={{ maxWidth: 480, borderRadius: 2 }}>
@@ -129,51 +143,93 @@ export function LoansPage() {
 
       {success && <Alert severity="success">{success}</Alert>}
 
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow sx={{ backgroundColor: 'primary.main' }}>
-              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Libro</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Usuario</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Fecha préstamo</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 700 }}>Vence</TableCell>
-              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Estado</TableCell>
-              <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Acción</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loans.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} align="center" sx={{ color: 'text.secondary', py: 4 }}>
-                  No hay registros
-                </TableCell>
+      {showOverdue ? (
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: 'error.main' }}>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Libro</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Usuario</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Fecha préstamo</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Venció</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Días vencido</TableCell>
               </TableRow>
-            )}
-            {loans.map((loan) => (
-              <TableRow key={loan.id} hover>
-                <TableCell>{loan.book?.title ?? '—'}</TableCell>
-                <TableCell>{loan.user?.name ?? '—'}</TableCell>
-                <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
-                <TableCell align="center">
-                  <Chip
-                    label={loan.status}
-                    color={loan.status === 'VENCIDO' ? 'error' : loan.status === 'ACTIVO' ? 'success' : 'default'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell align="center">
-                  {loan.status === 'ACTIVO' && (
-                    <Button size="small" variant="outlined" onClick={() => handleReturn(loan.id)}>
-                      Devolver
-                    </Button>
-                  )}
-                </TableCell>
+            </TableHead>
+            <TableBody>
+              {overdueLoans.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                    No hay préstamos vencidos
+                  </TableCell>
+                </TableRow>
+              )}
+              {overdueLoans.map((loan) => {
+                const diasVencido = Math.floor(
+                  (Date.now() - new Date(loan.expectedReturnDate).getTime()) / (1000 * 60 * 60 * 24)
+                );
+                return (
+                  <TableRow key={loan.id} hover sx={{ backgroundColor: '#fdecea' }}>
+                    <TableCell>{loan.book?.title ?? '—'}</TableCell>
+                    <TableCell>{loan.user?.name ?? '—'}</TableCell>
+                    <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
+                    <TableCell sx={{ color: 'error.main', fontWeight: 700 }}>{diasVencido} días</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: 'primary.main' }}>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Libro</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Usuario</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Fecha préstamo</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 700 }}>Vence</TableCell>
+                <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Estado</TableCell>
+                <TableCell align="center" sx={{ color: 'white', fontWeight: 700 }}>Acción</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {loans.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                    No hay registros
+                  </TableCell>
+                </TableRow>
+              )}
+              {loans.map((loan) => {
+                const isOverdue = loan.status === 'ACTIVO' && new Date(loan.expectedReturnDate) < new Date();
+                return (
+                  <TableRow key={loan.id} hover sx={isOverdue ? { backgroundColor: '#fdecea' } : {}}>
+                    <TableCell>{loan.book?.title ?? '—'}</TableCell>
+                    <TableCell>{loan.user?.name ?? '—'}</TableCell>
+                    <TableCell>{new Date(loan.loanDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(loan.expectedReturnDate).toLocaleDateString()}</TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={isOverdue ? 'VENCIDO' : loan.status}
+                        color={isOverdue ? 'error' : loan.status === 'ACTIVO' ? 'success' : 'default'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {loan.status === 'ACTIVO' && (
+                        <Button size="small" variant="outlined" onClick={() => handleReturn(loan.id)}>
+                          Devolver
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </Stack>
   );
 }
