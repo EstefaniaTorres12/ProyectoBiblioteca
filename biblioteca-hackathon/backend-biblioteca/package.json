@@ -1,0 +1,52 @@
+{
+  "name": "backend-biblioteca",
+  "version": "1.0.0",
+  "description": "API REST para sistema de préstamos de biblioteca",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest --runInBand",
+    "test:bdd": "cucumber-js tests/bdd/features/**/*.feature --require-module ts-node/register --require tests/bdd/steps/**/*.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "helmet": "latest",
+    "jsonwebtoken": "latest",
+    "morgan": "latest",
+    "swagger-jsdoc": "latest",
+    "swagger-ui-express": "latest",
+    "zod": "latest"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "latest",
+    "@types/bcryptjs": "latest",
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/jest": "latest",
+    "@types/jsonwebtoken": "latest",
+    "@types/morgan": "latest",
+    "@types/node": "latest",
+    "@types/supertest": "latest",
+    "@types/swagger-jsdoc": "latest",
+    "@types/swagger-ui-express": "latest",
+    "jest": "latest",
+    "prisma": "^5.22.0",
+    "supertest": "latest",
+    "ts-jest": "latest",
+    "ts-node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}
