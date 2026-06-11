@@ -90,7 +90,7 @@ export function BooksPage() {
       {success && <Alert severity="success">{success}</Alert>}
 
       <Stack direction="row" spacing={2}>
-        <TextField label="Buscar por título o autor" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <TextField label="Buscar por título o autor" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void load(); }} />
         <Button variant="contained" onClick={() => load()}>Buscar</Button>
       </Stack>
 
