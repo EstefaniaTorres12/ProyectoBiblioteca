@@ -31,3 +31,15 @@ export async function getOverdueLoans(): Promise<Loan[]> {
   const { data } = await apiClient.get<Loan[]>('/loans/overdue');
   return data;
 }
+
+export interface TodayLoansResponse {
+  loans: Loan[];
+  total: number;
+}
+
+export async function getTodayLoans(userName?: string): Promise<TodayLoansResponse> {
+  const { data } = await apiClient.get<TodayLoansResponse>('/loans/today', {
+    params: userName ? { userName } : undefined,
+  });
+  return data;
+}

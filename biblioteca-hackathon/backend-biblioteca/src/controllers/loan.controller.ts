@@ -31,4 +31,18 @@ export class LoanController {
   async overdue(_req: Request, res: Response) {
     res.json(await service.findOverdue());
   }
+
+  async today(req: Request, res: Response) {
+    const userName = req.query.userName as string | undefined;
+    res.json(await service.findToday(userName || undefined));
+  }
+
+  async searchByUserName(req: Request, res: Response) {
+    const name = req.query.userName as string | undefined;
+    if (!name) {
+      res.status(400).json({ message: 'El parámetro userName es requerido' });
+      return;
+    }
+    res.json(await service.searchByUserName(name));
+  }
 }

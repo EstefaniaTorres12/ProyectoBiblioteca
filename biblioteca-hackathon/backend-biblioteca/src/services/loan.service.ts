@@ -54,6 +54,20 @@ export class LoanService {
     return loans.findOverdue(new Date());
   }
 
+  searchByUserName(name: string) {
+    if (!name.trim()) throw new Error('El nombre de usuario no puede estar vacío');
+    return loans.findByUserName(name.trim());
+  }
+
+  async findToday(userName?: string) {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    const loansList = await loans.findToday(start, end, userName);
+    return { loans: loansList, total: loansList.length };
+  }
+
   calculateFine(expectedReturnDate: Date, actualReturnDate: Date): number {
     const diffMs = actualReturnDate.getTime() - expectedReturnDate.getTime();
     const lateDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
