@@ -25,6 +25,24 @@ export class LoanRepository {
     });
   }
 
+  findToday(start: Date, end: Date, userName?: string) {
+    return prisma.loan.findMany({
+      where: {
+        loanDate: { gte: start, lt: end },
+        ...(userName ? { user: { name: { contains: userName } } } : {}),
+      },
+      include: { user: true, book: true },
+    });
+  }
+
+  findByUserName(name: string) {
+    return prisma.loan.findMany({
+      where: { user: { name: { contains: name } } },
+      include: { user: true, book: true },
+      orderBy: { loanDate: 'desc' },
+    });
+  }
+
   findById(id: number) {
     return prisma.loan.findUnique({ where: { id } });
   }
